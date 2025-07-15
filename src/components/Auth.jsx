@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { supabase } from '../utils/supabase'
 import { User, Mail, Lock, Loader } from 'lucide-react'
+import i18n from '../utils/i18n'
 
 const Auth = ({ onAuth }) => {
   const [isLogin, setIsLogin] = useState(true)
@@ -34,7 +35,7 @@ const Auth = ({ onAuth }) => {
         onAuth(result.data.user)
       }
     } catch (err) {
-      setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
+      setError(i18n.t('authError'))
     } finally {
       setLoading(false)
     }
@@ -47,9 +48,9 @@ const Auth = ({ onAuth }) => {
           <div className="mx-auto w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mb-4">
             <User className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">E-Bike Schadensmeldung</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{i18n.t('loginTitle')}</h1>
           <p className="text-gray-600 mt-2">
-            {isLogin ? 'Melden Sie sich an, um fortzufahren' : 'Erstellen Sie ein Konto'}
+            {isLogin ? i18n.t('loginSubtitle') : i18n.t('registerSubtitle')}
           </p>
         </div>
 
@@ -57,7 +58,7 @@ const Auth = ({ onAuth }) => {
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-Mail-Adresse
+                {i18n.t('emailLabel')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -66,7 +67,7 @@ const Auth = ({ onAuth }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field pl-10"
-                  placeholder="ihre.email@beispiel.de"
+                  placeholder={i18n.t('emailPlaceholder')}
                   required
                 />
               </div>
@@ -74,7 +75,7 @@ const Auth = ({ onAuth }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Passwort
+                {i18n.t('passwordLabel')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -103,7 +104,7 @@ const Auth = ({ onAuth }) => {
               {loading ? (
                 <Loader className="w-5 h-5 animate-spin" />
               ) : (
-                isLogin ? 'Anmelden' : 'Registrieren'
+                isLogin ? i18n.t('loginButton') : i18n.t('registerButton')
               )}
             </button>
           </form>
@@ -114,8 +115,8 @@ const Auth = ({ onAuth }) => {
               className="text-primary-600 hover:text-primary-700 font-medium"
             >
               {isLogin 
-                ? 'Noch kein Konto? Hier registrieren' 
-                : 'Bereits ein Konto? Hier anmelden'
+                ? i18n.t('noAccount')
+                : i18n.t('hasAccount')
               }
             </button>
           </div>

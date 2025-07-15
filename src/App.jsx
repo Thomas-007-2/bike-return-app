@@ -4,6 +4,7 @@ import PhotoUpload from './components/PhotoUpload'
 import ConditionForm from './components/ConditionForm'
 import ThankYou from './components/ThankYou'
 import { ArrowLeft, Loader } from 'lucide-react'
+import i18n from './utils/i18n'
 
 const App = () => {
   const [currentStep, setCurrentStep] = useState('photos')
@@ -12,14 +13,26 @@ const App = () => {
   const [merchantId, setMerchantId] = useState('')
   const [loading, setLoading] = useState(false)
   const [submissionComplete, setSubmissionComplete] = useState(false)
+  const [language, setLanguage] = useState(i18n.getLanguage())
 
   useEffect(() => {
     // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search)
     const id = urlParams.get('id') || `ORDER-${Date.now()}`
     const mid = urlParams.get('mid') || 'default'
+    const lang = urlParams.get('lang')
+    
     setOrderId(id)
     setMerchantId(mid)
+    
+    // Update language if needed
+    if (lang === 'en') {
+      i18n.setLanguage('en')
+      setLanguage('en')
+    } else {
+      i18n.setLanguage('de')
+      setLanguage('de')
+    }
   }, [])
 
   // Scroll to top when step changes
@@ -63,7 +76,7 @@ const App = () => {
       setSubmissionComplete(true)
     } catch (error) {
       console.error('Error submitting report:', error)
-      alert('Fehler beim Übertragen der Meldung. Bitte versuchen Sie es erneut.')
+      alert(i18n.t('errorMessage'))
     } finally {
       setLoading(false)
     }
@@ -90,10 +103,10 @@ const App = () => {
               )}
               <div>
                 <h1 className="text-lg font-bold text-gray-900">
-                  Fahrrad Rückgabemeldung
+                  {i18n.t('title')}
                 </h1>
                 <p className="text-sm text-gray-600">
-                  Buchungs-ID: #{orderId}
+                  {i18n.t('bookingId')}: #{orderId}
                 </p>
               </div>
             </div>
@@ -115,7 +128,7 @@ const App = () => {
               }`}>
                 1
               </div>
-              <span className="ml-2 text-sm font-medium">Fotos</span>
+              <span className="ml-2 text-sm font-medium">{i18n.t('step1')}</span>
             </div>
             
             <div className="flex-1 h-1 bg-gray-200 rounded">
@@ -134,7 +147,7 @@ const App = () => {
               }`}>
                 2
               </div>
-              <span className="ml-2 text-sm font-medium">Zustand</span>
+              <span className="ml-2 text-sm font-medium">{i18n.t('step2')}</span>
             </div>
           </div>
         </div>
@@ -155,7 +168,7 @@ const App = () => {
                   onClick={handleNextStep}
                   className="btn-primary text-lg py-3 px-6"
                 >
-                  Weiter zur Zustandsbewertung
+                  {i18n.t('nextStepButton')}
                 </button>
               </div>
             )}
@@ -176,7 +189,7 @@ const App = () => {
           <div className="bg-white rounded-lg p-8 text-center">
             <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-primary-600" />
             <p className="text-lg font-medium text-gray-900">
-              Meldung wird übertragen...
+              {i18n.t('loadingMessage')}
             </p>
           </div>
         </div>

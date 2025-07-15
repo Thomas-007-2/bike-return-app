@@ -1,36 +1,40 @@
 import React, { useState, useEffect } from 'react'
 import { CheckCircle, AlertTriangle, ArrowRight, ArrowLeft } from 'lucide-react'
+import i18n from '../utils/i18n'
 
-const questions = [
-  {
-    id: 'schaltung',
-    question: 'Schaltung:',
-    type: 'problem_check',
-    problemPlaceholder: 'Hakt, springt, sonstiges'
-  },
-  {
-    id: 'bremsen',
-    question: 'Bremsen:',
-    type: 'problem_check',
-    problemPlaceholder: 'Schleifgeräusche, schlechte Bremsleistung, quietschen, sonstiges'
-  },
-  {
-    id: 'sonstige_maengel',
-    question: 'Sonstige Mängel:',
-    type: 'problem_check',
-    problemPlaceholder: 'Klappern/Knarzen, lockere Teile, Beleuchtung, sonstiges'
-  },
-  {
-    id: 'bemerkungen',
-    question: 'Zusätzliche Bemerkungen:',
-    type: 'text',
-    placeholder: 'Optional: weitere Anmerkungen zum Bike oder zum Ausleihprozess'
-  }
-]
+const getQuestions = () => {
+  return [
+    {
+      id: 'schaltung',
+      question: i18n.t('gears'),
+      type: 'problem_check',
+      problemPlaceholder: i18n.t('gearsPlaceholder')
+    },
+    {
+      id: 'bremsen',
+      question: i18n.t('brakes'),
+      type: 'problem_check',
+      problemPlaceholder: i18n.t('brakesPlaceholder')
+    },
+    {
+      id: 'sonstige_maengel',
+      question: i18n.t('otherIssues'),
+      type: 'problem_check',
+      problemPlaceholder: i18n.t('otherIssuesPlaceholder')
+    },
+    {
+      id: 'bemerkungen',
+      question: i18n.t('additionalNotes'),
+      type: 'text',
+      placeholder: i18n.t('additionalNotesPlaceholder')
+    }
+  ];
+};
 
 const ConditionForm = ({ onSubmit, loading = false }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [questions] = useState(getQuestions)
 
   const currentQuestion = questions[currentQuestionIndex]
   const isLastQuestion = currentQuestionIndex >= questions.length - 1
@@ -60,16 +64,20 @@ const ConditionForm = ({ onSubmit, loading = false }) => {
       const problemDetails = []
       
       if (answers.schaltung === 'probleme' && answers.schaltung_problem) {
-        problemDetails.push(`Schaltung: ${answers.schaltung_problem}`)
+        const prefix = i18n.getLanguage() === 'en' ? 'Gears' : 'Schaltung';
+        problemDetails.push(`${prefix}: ${answers.schaltung_problem}`)
       }
       if (answers.bremsen === 'probleme' && answers.bremsen_problem) {
-        problemDetails.push(`Bremsen: ${answers.bremsen_problem}`)
+        const prefix = i18n.getLanguage() === 'en' ? 'Brakes' : 'Bremsen';
+        problemDetails.push(`${prefix}: ${answers.bremsen_problem}`)
       }
       if (answers.sonstige_maengel === 'probleme' && answers.sonstige_maengel_problem) {
-        problemDetails.push(`Sonstige Mängel: ${answers.sonstige_maengel_problem}`)
+        const prefix = i18n.getLanguage() === 'en' ? 'Other Issues' : 'Sonstige Mängel';
+        problemDetails.push(`${prefix}: ${answers.sonstige_maengel_problem}`)
       }
       if (answers.bemerkungen) {
-        problemDetails.push(`Bemerkungen: ${answers.bemerkungen}`)
+        const prefix = i18n.getLanguage() === 'en' ? 'Notes' : 'Bemerkungen';
+        problemDetails.push(`${prefix}: ${answers.bemerkungen}`)
       }
       
       const description = problemDetails.join('; ')
@@ -117,7 +125,7 @@ const ConditionForm = ({ onSubmit, loading = false }) => {
             </div>
             <div className="flex items-center">
               <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
-              <span className="font-medium text-gray-900">Einwandfrei</span>
+              <span className="font-medium text-gray-900">{i18n.t('perfect')}</span>
             </div>
           </label>
 
@@ -145,7 +153,7 @@ const ConditionForm = ({ onSubmit, loading = false }) => {
             </div>
             <div className="flex items-center">
               <AlertTriangle className="w-5 h-5 mr-2 text-orange-500" />
-              <span className="font-medium text-gray-900">Probleme</span>
+              <span className="font-medium text-gray-900">{i18n.t('problems')}</span>
             </div>
           </label>
         </div>
@@ -196,7 +204,7 @@ const ConditionForm = ({ onSubmit, loading = false }) => {
         {/* Question Progress */}
         <div className="mb-6">
           <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
-            <span>Frage {currentQuestionIndex + 1} von {questions.length}</span>
+            <span>{i18n.t('question')} {currentQuestionIndex + 1} {i18n.t('of')} {questions.length}</span>
             <span>{Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
@@ -224,7 +232,7 @@ const ConditionForm = ({ onSubmit, loading = false }) => {
             className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Zurück</span>
+            <span>{i18n.t('back')}</span>
           </button>
 
           <button
@@ -234,8 +242,8 @@ const ConditionForm = ({ onSubmit, loading = false }) => {
           >
             <span>
               {isLastQuestion 
-                ? (loading ? 'Wird übertragen...' : 'Meldung abschicken')
-                : 'Weiter'
+                ? (loading ? i18n.t('sending') : i18n.t('submit'))
+                : i18n.t('next')
               }
             </span>
             {!isLastQuestion && <ArrowRight className="w-4 h-4" />}

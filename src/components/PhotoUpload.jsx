@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Camera, X, Image as ImageIcon } from 'lucide-react'
+import i18n from '../utils/i18n'
 
 const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
   const fileInputRef = useRef(null)
@@ -25,10 +26,10 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
     <div className="space-y-4">
       <div className="text-center">
         <h2 className="text-xl font-bold text-gray-900 mb-1">
-          Fotos hochladen
+          {i18n.t('uploadTitle')}
         </h2>
         <p className="text-gray-600 text-sm">
-          Lade Fotos vom Zustand des/der Bikes hoch
+          {i18n.t('uploadSubtitle')}
         </p>
       </div>
 
@@ -39,7 +40,7 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
           className="btn-primary flex items-center justify-center space-x-2 py-4"
         >
           <Camera className="w-5 h-5" />
-          <span>Kamera öffnen</span>
+          <span>{i18n.t('openCamera')}</span>
         </button>
         
         <button
@@ -47,7 +48,7 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
           className="btn-secondary flex items-center justify-center space-x-2 py-4"
         >
           <ImageIcon className="w-5 h-5" />
-          <span>Dateien auswählen</span>
+          <span>{i18n.t('selectFiles')}</span>
         </button>
       </div>
 
@@ -74,7 +75,7 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
       {photos.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-medium text-gray-900">
-            Ausgewählte Fotos ({photos.length})
+            {i18n.t('selectedPhotos')} ({photos.length})
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {photos.map((photo, index) => (
