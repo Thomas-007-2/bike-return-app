@@ -10,6 +10,7 @@ step2: 'Zustand',
 nextStepButton: 'Weiter zur Zustandsbewertung',
 loadingMessage: 'Meldung wird übertragen...',
 errorMessage: 'Fehler beim Übertragen der Meldung. Bitte versuchen Sie es erneut.',
+loading: 'Lädt...',
 
 // PhotoUpload.jsx 
 uploadTitle: 'Fotos hochladen',
@@ -67,6 +68,7 @@ step2: 'Condition',
 nextStepButton: 'Continue to Condition Assessment',
 loadingMessage: 'Submitting report...',
 errorMessage: 'Error submitting the report. Please try again.',
+loading: 'Loading...',
 
 // PhotoUpload.jsx 
 uploadTitle: 'Upload Photos',
