@@ -46,12 +46,12 @@ const getDefaultInstructions=()=> {
   if (merchantId !== '0MB1NGsZUlpbNn1Umyi9') {
     return [
       {
-        icon: 'CheckCircle',
-        title_de: 'Ihr alternativer Titel hier',
-        title_en: 'Your alternative title here',
-        description_de: 'Ihre alternative Beschreibung für andere Merchants.',
-        description_en: 'Your alternative description for other merchants.',
-        color: 'green'
+        icon: 'Lock',
+        title_de: 'Fahrrad abgeschlossen?',
+        title_en: 'Bike locked?',
+        description_de: 'Wenn das Fahrrad wieder abgeschlossen ist, ist nichts weiter zu tun. Wir wünschen noch einen tollen Tag!',
+        description_en: 'Once the bicycle is locked again, there's nothing more to do. We wish you a great day!',
+        color: 'orange'
       }
     ]
   }
