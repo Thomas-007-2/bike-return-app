@@ -50,7 +50,7 @@ const getDefaultInstructions=()=> {
         title_de: 'Fahrrad abgeschlossen?',
         title_en: 'Bike locked?',
         description_de: 'Wenn das Fahrrad wieder abgeschlossen ist, ist nichts weiter zu tun. Wir wünschen noch einen tollen Tag!',
-        description_en: 'Once the bicycle is locked again, there is nothing more to do. We wish you a great day!',
+        description_en: 'Once the bicycle is locked again, theres nothing more to do. We wish you a great day!',
         color: 'orange'
       }
     ]
