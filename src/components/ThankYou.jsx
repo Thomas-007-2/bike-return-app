@@ -42,12 +42,25 @@ setLoading(false)
 },[merchantId])
 
 const getDefaultInstructions=()=> {
+  // Für alle anderen Merchant IDs außer "0MB1NGsZUlpbNn1Umyi9"
+  if (merchantId !== '0MB1NGsZUlpbNn1Umyi9') {
+    return [
+      {
+        icon: 'CheckCircle',
+        title_de: 'Ihr alternativer Titel hier',
+        title_en: 'Your alternative title here',
+        description_de: 'Ihre alternative Beschreibung für andere Merchants.',
+        description_en: 'Your alternative description for other merchants.',
+        color: 'green'
+      }
+    ]
+  }
 return [
 {
 icon: 'Battery',
-title_de: 'Bei E-Bike: aufladen nicht vergessen',
+title_de: 'Bei E-Bike: Aufladen nicht vergessen',
 title_en: 'For E-Bikes: Don\'t Forget to Charge',
-description_de: 'Bitte schließe das Ladegerät an,bevor Du den Raum verlässt.',
+description_de: 'Bitte schließe das Ladegerät an, bevor Du den Raum verlässt.',
 description_en: 'Please connect the charger before leaving the room.',
 color: 'blue'
 },
