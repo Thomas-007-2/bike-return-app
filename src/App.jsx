@@ -11,6 +11,7 @@ const [currentStep,setCurrentStep]=useState('photos')
 const [photos,setPhotos]=useState([]) 
 const [orderId,setOrderId]=useState('') 
 const [merchantId,setMerchantId]=useState('') 
+const [storeId, setStoreId] = useState('') // Neu hinzufügen  
 const [loading,setLoading]=useState(false) 
 const [submissionComplete,setSubmissionComplete]=useState(false) 
 const [language,setLanguage]=useState(i18n.getLanguage()) 
@@ -20,10 +21,12 @@ useEffect(()=> {
 const urlParams=new URLSearchParams(window.location.search) 
 const id=urlParams.get('id') || `ORDER-${Date.now()}` 
 const mid=urlParams.get('mid') || 'default' 
+const stid = urlParams.get('stid') || 'default' // Neu hinzufügen  
 const lang=urlParams.get('lang') 
 
 setOrderId(id) 
 setMerchantId(mid) 
+setStoreId(stid) // Neu hinzufügen  
 
 // Update language if needed 
 if (lang==='en') {
@@ -73,6 +76,15 @@ const uploads=await Promise.all(uploadPromises)
 console.log('Photos uploaded:',uploads)
 } 
 
+// Call webhook - Neu hinzufügen
+      try {
+        await callWebhook(orderId, storeId)
+        console.log('Webhook called successfully')
+      } catch (webhookError) {
+        console.error('Webhook call failed, but continuing with submission:', webhookError)
+        // Fortsetzung auch wenn Webhook fehlschlägt
+      }
+  
 setSubmissionComplete(true)
 } catch (error) {
 console.error('Error submitting report:',error) 
