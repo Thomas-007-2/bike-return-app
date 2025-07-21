@@ -63,6 +63,33 @@ if (photoError) throw photoError
 return {upload: uploadData,photo: photoData[0]}
 }
 
+export const callWebhook = async (orderId, storeId) => {
+  try {
+    const response = await fetch('https://cloud.activepieces.com/api/v1/webhooks/ZQWjCysxyz4YAUgjMQSeb', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        store_id: storeId,
+        all_ok: 'yes'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Webhook call failed: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Webhook called successfully:', result);
+    return result;
+  } catch (error) {
+    console.error('Error calling webhook:', error);
+    throw error;
+  }
+}
+
 export const getMerchantConfig=async (merchantId)=> {
 const {data,error}=await supabase 
 .from('merchant_configurations') 
