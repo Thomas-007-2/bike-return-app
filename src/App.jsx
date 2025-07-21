@@ -5,6 +5,7 @@ import ConditionForm from './components/ConditionForm'
 import ThankYou from './components/ThankYou'
 import {ArrowLeft,Loader} from 'lucide-react'
 import i18n from './utils/i18n' 
+import { createReport, uploadPhoto, callWebhook } from './utils/supabase' // callWebhook importieren
 
 const App=()=> {
 const [currentStep,setCurrentStep]=useState('photos') 
