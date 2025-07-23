@@ -5,6 +5,33 @@ const supabaseKey=import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase=createClient(supabaseUrl,supabaseKey)
 
+export const createReport = async (orderId, status, description, merchantId) => {
+  const {data, error} = await supabase
+    .from('return_reports')
+    .insert([
+      {
+        order_id: orderId,
+        merchant_id: merchantId,
+        status,
+        description,
+        created_at_vienna: new Date().toLocaleString('en-CA', {
+          timeZone: 'Europe/Vienna',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).replace(/,/g, '')
+      }
+    ])
+    .select()
+  
+  if (error) throw error
+  return data[0]
+}
+
 export const uploadPhoto = async (file, orderId, merchantId) => {
   // Generate unique filename 
   const fileExt = 'jpg' // Always use jpg extension for compressed images
