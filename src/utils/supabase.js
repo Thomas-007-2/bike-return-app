@@ -5,64 +5,38 @@ const supabaseKey=import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase=createClient(supabaseUrl,supabaseKey)
 
-export const createReport=async (orderId,status,description,merchantId)=> {
-const {data,error}=await supabase 
-.from('return_reports') 
-.insert([ 
-{
-order_id: orderId,
-merchant_id: merchantId,
-status,
-description,
-created_at_vienna: new Date().toLocaleString('en-CA',{
-timeZone: 'Europe/Vienna',
-year: 'numeric',
-month: '2-digit',
-day: '2-digit',
-hour: '2-digit',
-minute: '2-digit',
-second: '2-digit',
-hour12: false
-}).replace(/,/g,'')
-} 
-]) 
-.select() 
+export const uploadPhoto = async (file, orderId, merchantId) => {
+  // Generate unique filename 
+  const fileExt = 'jpg' // Always use jpg extension for compressed images
+  const fileName = `${orderId}_${Date.now()}.${fileExt}` 
+  const filePath = `${merchantId}/${orderId}/${fileName}` 
 
-if (error) throw error 
-return data[0]
+  // Upload file to storage 
+  const {data: uploadData, error: uploadError} = await supabase.storage 
+    .from('return-photos') 
+    .upload(filePath, file, {
+      contentType: 'image/jpeg' // Set content type to JPEG
+    }) 
+
+  if (uploadError) throw uploadError 
+
+  // Create photo record 
+  const {data: photoData, error: photoError} = await supabase 
+    .from('return_photos') 
+    .insert([ 
+      {
+        order_id: orderId,
+        merchant_id: merchantId,
+        file_name: fileName,
+        file_path: filePath
+      } 
+    ]) 
+    .select() 
+
+  if (photoError) throw photoError 
+
+  return {upload: uploadData, photo: photoData[0]}
 }
-
-export const uploadPhoto=async (file,orderId,merchantId)=> {
-// Generate unique filename 
-const fileExt=file.name.split('.').pop() 
-const fileName=`${orderId}_${Date.now()}.${fileExt}` 
-const filePath=`${merchantId}/${orderId}/${fileName}` 
-
-// Upload file to storage 
-const {data: uploadData,error: uploadError}=await supabase.storage 
-.from('return-photos') 
-.upload(filePath,file) 
-
-if (uploadError) throw uploadError 
-
-// Create photo record 
-const {data: photoData,error: photoError}=await supabase 
-.from('return_photos') 
-.insert([ 
-{
-order_id: orderId,
-merchant_id: merchantId,
-file_name: fileName,
-file_path: filePath
-} 
-]) 
-.select() 
-
-if (photoError) throw photoError 
-
-return {upload: uploadData,photo: photoData[0]}
-}
-
 export const callWebhook = async (orderId, storeId) => {
   try {
     const response = await fetch('https://cloud.activepieces.com/api/v1/webhooks/ZQWjCysxyz4YAUgjMQSeb', {
