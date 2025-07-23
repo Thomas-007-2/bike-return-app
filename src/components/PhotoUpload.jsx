@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { Camera, X, Image as ImageIcon } from 'lucide-react'
+import imageCompression from 'browser-image-compression'
 import i18n from '../utils/i18n'
 
 const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
@@ -17,14 +18,18 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
     }
     
     try {
+      console.log(`Original file size: ${(file.size / 1024 / 1024).toFixed(2)} MB`)
       const compressedFile = await imageCompression(file, options)
+      console.log(`Compressed file size: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`)
       
       // Create a new file with jpg extension regardless of original extension
-      return new File(
+      const finalFile = new File(
         [compressedFile], 
         `${file.name.split('.')[0]}.jpg`,
         { type: 'image/jpeg' }
       )
+      
+      return finalFile
     } catch (error) {
       console.error('Error compressing image:', error)
       // Return original file if compression fails
@@ -39,6 +44,11 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
         file.type.startsWith('image/')
       )
       
+      if (validFiles.length === 0) {
+        alert('Please select valid image files')
+        return
+      }
+      
       // Compress all valid images
       const compressPromises = validFiles.map(compressImage)
       const compressedFiles = await Promise.all(compressPromises)
@@ -46,6 +56,7 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
       onPhotosSelected([...photos, ...compressedFiles])
     } catch (error) {
       console.error('Error processing images:', error)
+      alert('Error processing images. Please try again.')
     } finally {
       setCompressing(false)
     }
@@ -58,6 +69,14 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
 
   const getImagePreview = (file) => {
     return URL.createObjectURL(file)
+  }
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
   return (
@@ -75,20 +94,32 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <button
           onClick={() => cameraInputRef.current?.click()}
-          className="btn-primary flex items-center justify-center space-x-2 py-4"
+          disabled={compressing}
+          className="btn-primary flex items-center justify-center space-x-2 py-4 disabled:opacity-50"
         >
           <Camera className="w-5 h-5" />
-          <span>{i18n.t('openCamera')}</span>
+          <span>{compressing ? 'Processing...' : i18n.t('openCamera')}</span>
         </button>
         
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="btn-secondary flex items-center justify-center space-x-2 py-4"
+          disabled={compressing}
+          className="btn-secondary flex items-center justify-center space-x-2 py-4 disabled:opacity-50"
         >
           <ImageIcon className="w-5 h-5" />
-          <span>{i18n.t('selectFiles')}</span>
+          <span>{compressing ? 'Processing...' : i18n.t('selectFiles')}</span>
         </button>
       </div>
+
+      {/* Compression Status */}
+      {compressing && (
+        <div className="text-center py-4">
+          <div className="inline-flex items-center space-x-2 text-blue-600">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span className="text-sm">Compressing images...</span>
+          </div>
+        </div>
+      )}
 
       {/* Hidden Inputs */}
       <input
@@ -133,7 +164,8 @@ const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
                   <X className="w-4 h-4" />
                 </button>
                 <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                  {photo.name}
+                  <div>{photo.name}</div>
+                  <div className="text-xs opacity-75">{formatFileSize(photo.size)}</div>
                 </div>
               </div>
             ))}
