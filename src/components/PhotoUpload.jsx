@@ -5,12 +5,50 @@ import i18n from '../utils/i18n'
 const PhotoUpload = ({ onPhotosSelected, photos = [] }) => {
   const fileInputRef = useRef(null)
   const cameraInputRef = useRef(null)
-
-  const handleFiles = (files) => {
-    const validFiles = Array.from(files).filter(file => 
-      file.type.startsWith('image/')
-    )
-    onPhotosSelected([...photos, ...validFiles])
+  const [compressing, setCompressing] = useState(false)
+  
+  const compressImage = async (file) => {
+    const options = {
+      maxSizeMB: 0.5,         // 500KB max size
+      maxWidthOrHeight: 1920, // Reasonable resolution limit
+      useWebWorker: true,     // Use web workers for better performance
+      fileType: 'image/jpeg', // Convert to JPEG format
+      initialQuality: 0.8     // Start with 80% quality
+    }
+    
+    try {
+      const compressedFile = await imageCompression(file, options)
+      
+      // Create a new file with jpg extension regardless of original extension
+      return new File(
+        [compressedFile], 
+        `${file.name.split('.')[0]}.jpg`,
+        { type: 'image/jpeg' }
+      )
+    } catch (error) {
+      console.error('Error compressing image:', error)
+      // Return original file if compression fails
+      return file
+    }
+  }
+  
+  const handleFiles = async (files) => {
+    setCompressing(true)
+    try {
+      const validFiles = Array.from(files).filter(file => 
+        file.type.startsWith('image/')
+      )
+      
+      // Compress all valid images
+      const compressPromises = validFiles.map(compressImage)
+      const compressedFiles = await Promise.all(compressPromises)
+      
+      onPhotosSelected([...photos, ...compressedFiles])
+    } catch (error) {
+      console.error('Error processing images:', error)
+    } finally {
+      setCompressing(false)
+    }
   }
 
   const removePhoto = (index) => {
