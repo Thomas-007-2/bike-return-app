@@ -115,11 +115,6 @@ const ThankYou = ({ orderId, merchantId, submissionId }) => {
           <p className="text-lg text-gray-600">
             {i18n.t('submissionSuccess')}
           </p>
-          {submissionId && (
-            <p className="text-sm text-gray-500 mt-2">
-              Submission ID: {submissionId}
-            </p>
-          )}
         </div>
 
         <div className="card space-y-6">
