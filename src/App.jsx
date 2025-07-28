@@ -17,6 +17,7 @@ const App = () => {
   const [language, setLanguage] = useState(i18n.getLanguage())
   const [hasSubmitted, setHasSubmitted] = useState(false) // Add submission guard
   const [submissionId, setSubmissionId] = useState('')
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     // Get parameters from URL
@@ -38,6 +39,8 @@ const App = () => {
       i18n.setLanguage('de')
       setLanguage('de')
     }
+    
+    console.log('App initialized with:', { orderId: id, merchantId: mid, storeId: stid, language: lang || 'de' })
   }, [])
 
   // Scroll to top when step changes
@@ -70,9 +73,11 @@ const App = () => {
 
     setLoading(true)
     setHasSubmitted(true)
+    setError(null)
     
     try {
       console.log('Submitting report for order:', orderId, 'merchant:', merchantId)
+      console.log('Form data:', formData)
       
       // Create the report with a unique submission ID
       const report = await createReport(orderId, formData.status, formData.description, merchantId)
@@ -85,6 +90,7 @@ const App = () => {
       
       // Upload photos
       if (photos.length > 0) {
+        console.log('Uploading photos:', photos.length)
         const uploadPromises = photos.map(photo => 
           uploadPhoto(photo, orderId, merchantId)
         )
@@ -104,7 +110,7 @@ const App = () => {
       setSubmissionComplete(true)
     } catch (error) {
       console.error('Error submitting report:', error)
-      alert(i18n.t('errorMessage'))
+      setError(error.message || i18n.t('errorMessage'))
       setHasSubmitted(false) // Reset on error to allow retry
     } finally {
       setLoading(false)
@@ -185,6 +191,12 @@ const App = () => {
 
       {/* Main Content */}
       <main className="max-w-2xl mx-auto px-4 py-4">
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
+        
         {currentStep === 'photos' && (
           <div className="space-y-4">
             <PhotoUpload 
