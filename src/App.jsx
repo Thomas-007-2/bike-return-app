@@ -16,6 +16,7 @@ const App = () => {
   const [submissionComplete, setSubmissionComplete] = useState(false)
   const [language, setLanguage] = useState(i18n.getLanguage())
   const [hasSubmitted, setHasSubmitted] = useState(false) // Add submission guard
+  const [submissionId, setSubmissionId] = useState('')
 
   useEffect(() => {
     // Get parameters from URL
@@ -73,9 +74,14 @@ const App = () => {
     try {
       console.log('Submitting report for order:', orderId, 'merchant:', merchantId)
       
-      // Create the report
+      // Create the report with a unique submission ID
       const report = await createReport(orderId, formData.status, formData.description, merchantId)
       console.log('Report created:', report)
+      
+      // Store the submission ID for reference
+      if (report && report.submission_id) {
+        setSubmissionId(report.submission_id)
+      }
       
       // Upload photos
       if (photos.length > 0) {
@@ -106,7 +112,7 @@ const App = () => {
   }
 
   if (submissionComplete) {
-    return <ThankYou orderId={orderId} merchantId={merchantId} />
+    return <ThankYou orderId={orderId} merchantId={merchantId} submissionId={submissionId} />
   }
 
   return (

@@ -6,6 +6,24 @@ const supabaseKey=import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase=createClient(supabaseUrl,supabaseKey)
 
 export const createReport = async (orderId, status, description, merchantId) => {
+  // Generate a unique submission ID
+  const submissionId = `${orderId}_${merchantId}_${Date.now()}`
+  
+  // First check if a report already exists for this order and merchant
+  const { data: existingReport } = await supabase
+    .from('return_reports')
+    .select('id')
+    .eq('order_id', orderId)
+    .eq('merchant_id', merchantId)
+    .maybeSingle()
+  
+  if (existingReport) {
+    console.log(`Report already exists for order ${orderId} and merchant ${merchantId}`)
+    // Return the existing report to prevent duplicate creation
+    return existingReport
+  }
+  
+  // If no existing report, create a new one
   const {data, error} = await supabase
     .from('return_reports')
     .insert([
@@ -14,6 +32,7 @@ export const createReport = async (orderId, status, description, merchantId) => 
         merchant_id: merchantId,
         status,
         description,
+        submission_id: submissionId,
         created_at_vienna: new Date().toLocaleString('en-CA', {
           timeZone: 'Europe/Vienna',
           year: 'numeric',
@@ -28,7 +47,22 @@ export const createReport = async (orderId, status, description, merchantId) => 
     ])
     .select()
   
-  if (error) throw error
+  if (error) {
+    // If we get a unique constraint violation, it means another process created the report
+    // in the time between our check and insert. In that case, we fetch the existing report.
+    if (error.code === '23505') { // Unique constraint violation
+      const { data: existingReport } = await supabase
+        .from('return_reports')
+        .select('*')
+        .eq('order_id', orderId)
+        .eq('merchant_id', merchantId)
+        .single()
+      
+      return existingReport
+    }
+    throw error
+  }
+  
   return data[0]
 }
 
@@ -64,6 +98,7 @@ export const uploadPhoto = async (file, orderId, merchantId) => {
 
   return {upload: uploadData, photo: photoData[0]}
 }
+
 export const callWebhook = async (orderId, storeId) => {
   try {
     const response = await fetch('https://cloud.activepieces.com/api/v1/webhooks/ZQWjCysxyz4YAUgjMQSeb', {
