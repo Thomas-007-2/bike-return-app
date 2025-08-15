@@ -5,9 +5,15 @@ const supabaseKey=import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase=createClient(supabaseUrl,supabaseKey)
 
-export const createReport = async (orderId, status, description, merchantId) => {
+export const createReport = async (orderId, status, description, merchantId, locationNr = '') => {
   try {
-    console.log('Creating report with:', { orderId, status, description, merchantId });
+    console.log('Creating report with:', { 
+      orderId, 
+      status, 
+      description, 
+      merchantId,
+      locationNr // Log the location number
+    });
     
     // Generate a unique submission ID
     const submissionId = `${orderId}_${merchantId}_${Date.now()}`
@@ -45,7 +51,7 @@ export const createReport = async (orderId, status, description, merchantId) => 
     
     console.log('Inserting new report with Vienna time:', viennaTime);
     
-    // If no existing report, create a new one
+    // If no existing report, create a new one with location_nr
     const { data, error } = await supabase
       .from('return_reports')
       .insert([
@@ -55,7 +61,8 @@ export const createReport = async (orderId, status, description, merchantId) => 
           status,
           description,
           submission_id: submissionId,
-          created_at_vienna: viennaTime
+          created_at_vienna: viennaTime,
+          location_nr: locationNr // Store the location number
         }
       ])
       .select();
