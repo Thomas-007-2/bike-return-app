@@ -12,6 +12,7 @@ const App = () => {
   const [orderId, setOrderId] = useState('')
   const [merchantId, setMerchantId] = useState('')
   const [storeId, setStoreId] = useState('')
+  const [locationNr, setLocationNr] = useState('')  // Added location number state
   const [loading, setLoading] = useState(false)
   const [submissionComplete, setSubmissionComplete] = useState(false)
   const [language, setLanguage] = useState(i18n.getLanguage())
@@ -26,10 +27,12 @@ const App = () => {
     const mid = urlParams.get('mid') || 'default'
     const stid = urlParams.get('stid') || 'default'
     const lang = urlParams.get('lang')
+    const loc = urlParams.get('loc') || '' // Get location number from URL
     
     setOrderId(id)
     setMerchantId(mid)
     setStoreId(stid)
+    setLocationNr(loc) // Store the location number
     
     // Update language if needed
     if (lang === 'en') {
@@ -40,7 +43,13 @@ const App = () => {
       setLanguage('de')
     }
     
-    console.log('App initialized with:', { orderId: id, merchantId: mid, storeId: stid, language: lang || 'de' })
+    console.log('App initialized with:', { 
+      orderId: id, 
+      merchantId: mid, 
+      storeId: stid, 
+      locationNr: loc, 
+      language: lang || 'de' 
+    })
   }, [])
 
   // Scroll to top when step changes
@@ -76,11 +85,17 @@ const App = () => {
     setError(null)
     
     try {
-      console.log('Submitting report for order:', orderId, 'merchant:', merchantId)
+      console.log('Submitting report for order:', orderId, 'merchant:', merchantId, 'location:', locationNr)
       console.log('Form data:', formData)
       
       // Create the report with a unique submission ID
-      const report = await createReport(orderId, formData.status, formData.description, merchantId)
+      const report = await createReport(
+        orderId, 
+        formData.status, 
+        formData.description, 
+        merchantId,
+        locationNr // Pass location number to createReport
+      )
       console.log('Report created:', report)
       
       // Store the submission ID for reference
@@ -144,6 +159,11 @@ const App = () => {
                 <p className="text-sm text-gray-600">
                   {i18n.t('bookingId')}: #{orderId}
                 </p>
+                {locationNr && (
+                  <p className="text-sm text-gray-600">
+                    Location: {locationNr}
+                  </p>
+                )}
               </div>
             </div>
           </div>
