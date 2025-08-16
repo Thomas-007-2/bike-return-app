@@ -5,14 +5,15 @@ const supabaseKey=import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase=createClient(supabaseUrl,supabaseKey)
 
-export const createReport = async (orderId, status, description, merchantId, locationNr = '') => {
+export const createReport = async (orderId, status, description, merchantId, locationNr = '', storeId = '') => {
   try {
     console.log('Creating report with:', { 
       orderId, 
       status, 
       description, 
       merchantId,
-      locationNr // Log the location number
+      locationNr, // Log the location number
+      storeId // Log the store ID
     });
     
     // Generate a unique submission ID
@@ -51,7 +52,7 @@ export const createReport = async (orderId, status, description, merchantId, loc
     
     console.log('Inserting new report with Vienna time:', viennaTime);
     
-    // If no existing report, create a new one with location_nr
+    // If no existing report, create a new one with location_nr and store_id
     const { data, error } = await supabase
       .from('return_reports')
       .insert([
@@ -62,7 +63,8 @@ export const createReport = async (orderId, status, description, merchantId, loc
           description,
           submission_id: submissionId,
           created_at_vienna: viennaTime,
-          location_nr: locationNr // Store the location number
+          location_nr: locationNr, // Store the location number
+          store_id: storeId // Store the store ID
         }
       ])
       .select();
@@ -203,11 +205,11 @@ export const callWebhook = async (orderId, storeId) => {
   }
 }
 
-export const getMerchantConfig=async (merchantId)=> {
+export const getMerchantConfig = async (merchantId) => {
   try {
     console.log('Getting merchant config for:', merchantId);
     
-    const {data, error}=await supabase 
+    const {data, error} = await supabase 
       .from('merchant_configurations') 
       .select('*') 
       .eq('merchant_id', merchantId) 
