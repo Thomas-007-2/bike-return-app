@@ -12,7 +12,7 @@ const App = () => {
   const [orderId, setOrderId] = useState('')
   const [merchantId, setMerchantId] = useState('')
   const [storeId, setStoreId] = useState('')
-  const [locationNr, setLocationNr] = useState('')  // Added location number state
+  const [locationNr, setLocationNr] = useState('')  // Location number state
   const [loading, setLoading] = useState(false)
   const [submissionComplete, setSubmissionComplete] = useState(false)
   const [language, setLanguage] = useState(i18n.getLanguage())
@@ -85,7 +85,7 @@ const App = () => {
     setError(null)
     
     try {
-      console.log('Submitting report for order:', orderId, 'merchant:', merchantId, 'location:', locationNr)
+      console.log('Submitting report for order:', orderId, 'merchant:', merchantId, 'location:', locationNr, 'store:', storeId)
       console.log('Form data:', formData)
       
       // Create the report with a unique submission ID
@@ -94,7 +94,8 @@ const App = () => {
         formData.status, 
         formData.description, 
         merchantId,
-        locationNr // Pass location number to createReport
+        locationNr, // Pass location number to createReport
+        storeId // Pass store ID to createReport
       )
       console.log('Report created:', report)
       
@@ -162,6 +163,11 @@ const App = () => {
                 {locationNr && (
                   <p className="text-sm text-gray-600">
                     Location: {locationNr}
+                  </p>
+                )}
+                {storeId && storeId !== 'default' && (
+                  <p className="text-sm text-gray-600">
+                    Store: {storeId}
                   </p>
                 )}
               </div>
